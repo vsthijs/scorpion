@@ -1,0 +1,50 @@
+// rules
+
+program: statement*
+
+statement: expression ";"
+         | let_untyped_initialized
+         | let_typed_uninitialized
+         | let_typed_initialized
+
+expression: INTEGER
+          | expression bin_op expression
+          | fn_def
+          | type
+
+// let
+let_untyped_initialized: "let" IDENTIFIER "=" expression ";"
+let_typed_uninitialized: "let" IDENTIFIER ":" type ";"
+let_typed_initialized: "let" IDENTIFIER ":" type "=" expression ";"
+
+// types
+fn_type: "fn" "(" paramtypelist ")"
+       | "fn" "(" paramlist ")"
+
+paramtypelist: type ("," type)*
+paramlist: (IDENTIFIER ":" type) ("," (IDENTIFIER ":" type))*
+
+fn_def: "fn" "(" paramlist ")" "{" program "}"
+      | "fn" "(" paramlist ")" "{" "..." "}"
+
+type: IDENTIFIER
+    | "&" IDENTIFIER
+    | fn_type
+
+bin_op: "+"
+      | "-"
+      | "*"
+      | "/"
+      | "%"
+
+// tokens
+
+IDENTIFIER: /[a-zA-Z_][a-zA-Z0-9_]+/
+
+COMMENT: /\/\/[^\n]*\n?/
+
+%import common.SIGNED_NUMBER -> INTEGER
+%import common.WS
+
+%ignore WS
+%ignore COMMENT
