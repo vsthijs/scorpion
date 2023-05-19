@@ -2,10 +2,14 @@
 
 program: statement*
 
-statement: expression ";"
+statement: fn_def
+         | expression ";"
          | let_untyped_initialized
          | let_typed_uninitialized
          | let_typed_initialized
+         | let_fn_def
+         | let_fn_dec
+         | let_fn_defdec
 
 expression: INTEGER
           | expression bin_op expression
@@ -16,20 +20,24 @@ expression: INTEGER
 let_untyped_initialized: "let" IDENTIFIER "=" expression ";"
 let_typed_uninitialized: "let" IDENTIFIER ":" type ";"
 let_typed_initialized: "let" IDENTIFIER ":" type "=" expression ";"
+let_fn_def: "let" IDENTIFIER "=" fn_def
+let_fn_dec: "let" IDENTIFIER ":" type ";"
+let_fn_defdec: "let" IDENTIFIER ":" type "=" fn_def
 
 // types
-fn_type: "fn" "(" paramtypelist ")"
-       | "fn" "(" paramlist ")"
+fn_type: "fn" "(" paramtypelist ")" "->" type
 
 paramtypelist: type ("," type)*
 paramlist: (IDENTIFIER ":" type) ("," (IDENTIFIER ":" type))*
 
-fn_def: "fn" "(" paramlist ")" "{" program "}"
-      | "fn" "(" paramlist ")" "{" "..." "}"
+fn_def: "fn" "(" paramlist ")" "->" type "{" program "}"
+      | "fn" "(" paramlist ")" "->" type "{" "}"
 
 type: IDENTIFIER
-    | "&" IDENTIFIER
+    | reftype
     | fn_type
+
+reftype: "&" IDENTIFIER
 
 bin_op: "+"
       | "-"
